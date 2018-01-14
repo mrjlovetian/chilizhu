@@ -11,12 +11,16 @@ from bs4 import BeautifulSoup
 ssl._create_default_https_context = ssl._create_unverified_context
 url = ""
 
+totalCount = 0
+currCount = 0
 # http://www.cilizhu2.com/remen/index_101.html
 
 
 # 获取URL每张图对应的详情
 def getMainUrl(mainUrl):
     global index
+    global totalCount
+    global currCount
     dirver = webdriver.PhantomJS('phantomjs')
     dirver.get(mainUrl)
     time.sleep(0.3)
@@ -31,6 +35,8 @@ def getMainUrl(mainUrl):
 
     for zhongziUrl in zhongZiUrls:
         getZhongzi(zhongziUrl)
+    
+    totalCount = len(zhongZiUrls)
 
 
 # 打开详情查看是否有种子相关信息
@@ -81,7 +87,8 @@ def finalTorroent(findUrl):
     print('种子是', textEra.text)
     global url
     url = url + textEra.text + "\n"
-    print('url shhi duos',url)
+    currCount += 1
+    print('种子磁力链接%s, 当前数量是%s, 总的磁力数量是%s' %(url, currCount, totalCount))
     # writeTorroent(textEra.text)
     
     
@@ -90,8 +97,9 @@ def writeTorroent(torroent):
     fo.write(torroent+'\n')
     fo.close()
 
+index = 102
 # 遍历所有的URL
-for i in range(101, 102):
+for i in range(index, index+1):
     mainUrl = 'http://www.cilizhu2.com/remen/index_%s.html'%(i)
     print(mainUrl)
     getMainUrl(mainUrl)
