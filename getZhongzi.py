@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 import ssl
 from selenium import webdriver
 import urllib.request
@@ -7,7 +9,7 @@ import time
 from bs4 import BeautifulSoup
 
 ssl._create_default_https_context = ssl._create_unverified_context
-url = ''
+url = ""
 
 # http://www.cilizhu2.com/remen/index_101.html
 
@@ -17,7 +19,7 @@ def getMainUrl(mainUrl):
     global index
     dirver = webdriver.PhantomJS('phantomjs')
     dirver.get(mainUrl)
-    time.sleep(1.3)
+    time.sleep(0.3)
     bsObj = BeautifulSoup(dirver.page_source, 'lxml')
     zhongZiUrls = []
 
@@ -36,23 +38,33 @@ def getZhongzi(zhongZiurl):
     
     zhongziDriver = webdriver.PhantomJS()
     zhongziDriver.get(zhongZiurl)
-    time.sleep(0.5)
+    time.sleep(0.1)
     zhongZiObj = BeautifulSoup(zhongziDriver.page_source, 'lxml')
-    realZhongZiUrl = zhongZiObj.find('a', class_='btn btn-lg btn-primary')
-    print('real zhongziUrl', realZhongZiUrl['href'])
-    torrentUrl = 'http://www.cilizhu2.com' + realZhongZiUrl['href']
-    gettorrent(torrentUrl)
+    realZhongZiUrl = zhongZiObj.find_all('a', class_='btn btn-lg btn-primary')
+    if len(realZhongZiUrl) > 0:
+        # if realZhongZiUrl[0].find('key'):
+        #     print('real zhongziUrl', realZhongZiUrl['href'])
+        #     torrentUrl = 'http://www.cilizhu2.com' + realZhongZiUrl['href']
+        #     gettorrent(torrentUrl)
+        
+        item = realZhongZiUrl[0]
+        if item.has_attr('href'):
+            print('real zhongziUrl', item['href'])
+            torrentUrl = 'http://www.cilizhu2.com' + item['href']
+            gettorrent(torrentUrl)
+        
+    
 
 # 打开种子页面
 def gettorrent(torrentUrl):
     torrentDriver = webdriver.PhantomJS()
     torrentDriver.get(torrentUrl)
-    time.sleep(0.5)
+    time.sleep(0.1)
     torrentObj = BeautifulSoup(torrentDriver.page_source, 'lxml')
     
-    torroentDiv = torrentObj.find('div', class_='btsowlist')
+    torroentDiv = torrentObj.find_all('div', class_='btsowlist')
     if len(torroentDiv) > 0:
-        torroentA = torroentDiv.find('div', class_='row')
+        torroentA = torroentDiv[0].find('div', class_='row')
         # print('torroentA', torroentA)
         if len(torroentA) > 0:
             torroent = torroentA.find('a')['href']
@@ -63,14 +75,46 @@ def gettorrent(torrentUrl):
 def finalTorroent(findUrl):
     finalDriver =  webdriver.PhantomJS()
     finalDriver.get(findUrl)
-    time.sleep(0.5)
+    time.sleep(0.1)
     finalObj = BeautifulSoup(finalDriver.page_source, 'lxml')
     textEra = finalObj.find('textarea', class_='magnet-link')
     print('种子是', textEra.text)
+    global url
+    url = url + textEra.text + "\n"
+    print('url shhi duos',url)
+    # writeTorroent(textEra.text)
+    
+    
+def writeTorroent(torroent):
+    fo = open('torroent.js', 'a+')
+    fo.write(torroent+'\n')
+    fo.close()
 
 # 遍历所有的URL
-for i in range(101, 160):
+for i in range(101, 102):
     mainUrl = 'http://www.cilizhu2.com/remen/index_%s.html'%(i)
     print(mainUrl)
     getMainUrl(mainUrl)
+
+writeTorroent(url)
+print("done!!!!")
+
+# writeTorroent('我是想红菊1')
+# writeTorroent('我是想红菊2')
+# writeTorroent('我是想红菊3')
+# writeTorroent('我是想红菊4')
+
+
+# def addUrl(str):
+#     global url
+#     url = url + str + "\n"
+#     print("now", url)
+#     # url.append(str+"\n")
+#
+# addUrl("123a")
+# addUrl("123b")
+# addUrl("123c")
+# addUrl("123d")
+#
+# print('url', url)
 
