@@ -4,7 +4,6 @@ import ssl
 from selenium import webdriver
 import urllib.request
 import os
-import os
 import time
 from bs4 import BeautifulSoup
 
@@ -20,8 +19,7 @@ currCount = 0
 def getMainUrl(mainUrl):
     global index
     global totalCount
-    global currCount
-    dirver = webdriver.PhantomJS('phantomjs')
+    dirver = webdriver.PhantomJS()
     dirver.get(mainUrl)
     time.sleep(0.3)
     bsObj = BeautifulSoup(dirver.page_source, 'lxml')
@@ -33,10 +31,13 @@ def getMainUrl(mainUrl):
         print('******', imUrl)
         zhongZiUrls.append(imUrl)
 
+    totalCount += len(zhongZiUrls)
+    print ('totalCounttotalCounttotalCounttotalCounttotalCounttotalCounttotalCount', totalCount)
+
     for zhongziUrl in zhongZiUrls:
         getZhongzi(zhongziUrl)
     
-    totalCount = len(zhongZiUrls)
+
 
 
 # 打开详情查看是否有种子相关信息
@@ -48,11 +49,6 @@ def getZhongzi(zhongZiurl):
     zhongZiObj = BeautifulSoup(zhongziDriver.page_source, 'lxml')
     realZhongZiUrl = zhongZiObj.find_all('a', class_='btn btn-lg btn-primary')
     if len(realZhongZiUrl) > 0:
-        # if realZhongZiUrl[0].find('key'):
-        #     print('real zhongziUrl', realZhongZiUrl['href'])
-        #     torrentUrl = 'http://www.cilizhu2.com' + realZhongZiUrl['href']
-        #     gettorrent(torrentUrl)
-        
         item = realZhongZiUrl[0]
         if item.has_attr('href'):
             print('real zhongziUrl', item['href'])
@@ -81,30 +77,37 @@ def gettorrent(torrentUrl):
 def finalTorroent(findUrl):
     finalDriver =  webdriver.PhantomJS()
     finalDriver.get(findUrl)
-    time.sleep(0.1)
+    time.sleep(0.5)
     finalObj = BeautifulSoup(finalDriver.page_source, 'lxml')
+
     textEra = finalObj.find('textarea', class_='magnet-link')
-    print('种子是', textEra.text)
-    global url
-    url = url + textEra.text + "\n"
-    currCount += 1
-    print('种子磁力链接%s, 当前数量是%s, 总的磁力数量是%s' %(url, currCount, totalCount))
-    # writeTorroent(textEra.text)
+    print ('************************', textEra)
+    if not textEra is None:
+        print('种子是', textEra)
+        global url
+        global currCount
+        url = url + textEra.text + "\n"
+        currCount += 1
+        print(' 当前数量是%s, 总的磁力数量是%s' % (currCount, totalCount))
+        print ('当前收集到种子为', url)
+        # writeTorroent(textEra.text)
+
     
     
-def writeTorroent(torroent):
-    fo = open('torroent.js', 'a+')
+def writeTorroent(torroent, name):
+    fileName = str(name) + 'torroent.js'
+    fo = open(fileName, 'a+')
     fo.write(torroent+'\n')
     fo.close()
 
-index = 102
+index = 104
 # 遍历所有的URL
 for i in range(index, index+1):
     mainUrl = 'http://www.cilizhu2.com/remen/index_%s.html'%(i)
     print(mainUrl)
     getMainUrl(mainUrl)
 
-writeTorroent(url)
+writeTorroent(url, index)
 print("done!!!!")
 
 # writeTorroent('我是想红菊1')
