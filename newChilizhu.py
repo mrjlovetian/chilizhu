@@ -1,4 +1,3 @@
-import ssl
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import urllib.request
@@ -6,15 +5,9 @@ import os
 import time
 from bs4 import BeautifulSoup
 
-ssl._create_default_https_context = ssl._create_unverified_context
 allTorrents = ''
-
 totalCount = 0
 currCount = 0
-
-
-# http://www.cilizhu2.com/remen/index_101.html
-
 
 # 获取URL每张图对应的详情
 def getMainUrl(mainUrl):
@@ -33,7 +26,6 @@ def getMainUrl(mainUrl):
     for zhongziUrl in zhongZiUrls:
         getZhongzi(zhongziUrl)
 
-
 # 打开详情查看是否有种子相关信息
 def getZhongzi(zhongZiurl):
     browser.get(zhongZiurl)
@@ -47,7 +39,6 @@ def getZhongzi(zhongZiurl):
             torrentUrl = 'http://www.cilizhu2.com' + item['href']
             gettorrent(torrentUrl)
 
-
 # 打开种子页面
 def gettorrent(torrentUrl):
     browser.get(torrentUrl)
@@ -60,7 +51,6 @@ def gettorrent(torrentUrl):
             torroent = torroentA.find('a')['href']
             print('find url ', torroent)
             finalTorroent(torroent)
-
 
 # 招到最终可以下载的种子
 def finalTorroent(findUrl):
@@ -91,9 +81,11 @@ chrome_options.add_argument('--headless')
 chrome_options.add_argument('--disable-gpu')
 browser = webdriver.Chrome(chrome_options=chrome_options)
 
-index = 152
+index = Int(input("请输入页码:"))
+pageCount = Int(input("请输入翻页跨度:"))
+
 # 遍历所有的URL
-for i in range(index, index + 5):
+for i in range(index, index + pageCount):
     mainUrl = 'http://www.cilizhu2.com/remen/index_%s.html' % (i)
     print(mainUrl)
     getMainUrl(mainUrl)
@@ -101,3 +93,5 @@ for i in range(index, index + 5):
 
 writeTorroent(allTorrents, index)
 print("done!!!!")
+browser.close()
+
