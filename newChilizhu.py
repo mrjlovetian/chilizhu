@@ -81,8 +81,8 @@ chrome_options.add_argument('--headless')
 chrome_options.add_argument('--disable-gpu')
 browser = webdriver.Chrome(chrome_options=chrome_options)
 
-index = Int(input("请输入页码:"))
-pageCount = Int(input("请输入翻页跨度:"))
+index = int(input("请输入页码:"))
+pageCount = int(input("请输入翻页跨度:"))
 
 # 遍历所有的URL
 for i in range(index, index + pageCount):
